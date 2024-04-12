@@ -138,7 +138,7 @@ async def loop(ctx: commands.Context, *args):
     try:
         loop = queues[ctx.guild.id]['loop']
     except KeyError:
-        await ctx.send('there is no queue to loop')
+        await ctx.send('the bot isn\'t playing anything')
         return
     queues[ctx.guild.id]['loop'] = not loop
 
