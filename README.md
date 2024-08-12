@@ -32,10 +32,12 @@ A word of warning before we start though: you'll need somewhere to host the bot.
 2. Download the code. You can do this by downloading the zip and unzipping it, or with a `git clone` command, or however you prefer to get GitHub content.
 3. Make sure you have Python 3.8 or later installed.
 4. Open up a console wherever you downloaded the code to (don't forget to unzip it if it's zipped), and run `pip install -r requirements.txt`
-5. Create a copy of the ".env_example" file named ".env"
-6. Head back to the "Bot" page. Click "Reset Token", then click "Copy". This will copy your bot's unique token so that the code can identify itself as the bot you've just created.
-7. Edit ".env" and replace "your-token-goes-here" with the token you just copied.
-8. Run `nohup ./youtubebot.py &` on Linux/Unix or `python youtube.py` on Windows (note that on Windows, if you close the console your bot will stop). For Linux/Unix: if you get an error along the lines of "permission denied" or "not executable", run `chmod +x youtubebot.py` to make it executable and try again.
-9. The bot is now running. To stop it, run `pkill -f youtubebot.py` on Linux/Unix or press `ctrl+c` while clicked into your console on Windows.
+5. Additionally, install YouTube OAuth2 for yt-dlp: `python3 -m pip install -U https://github.com/coletdjnz/yt-dlp-youtube-oauth2/archive/refs/heads/master.zip`
+6. Create a copy of the ".env_example" file named ".env"
+7. Head back to the "Bot" page. Click "Reset Token", then click "Copy". This will copy your bot's unique token so that the code can identify itself as the bot you've just created.
+8. Edit ".env" and replace "your-token-goes-here" with the token you just copied.
+9. On first run, use `python youtube.py` and follow instructions: https://github.com/coletdjnz/yt-dlp-youtube-oauth2?tab=readme-ov-file#logging-in
+10. Run `nohup ./youtubebot.py &` on Linux/Unix or `python youtube.py` on Windows (note that on Windows, if you close the console your bot will stop). For Linux/Unix: if you get an error along the lines of "permission denied" or "not executable", run `chmod +x youtubebot.py` to make it executable and try again.
+11. The bot is now running. To stop it, run `pkill -f youtubebot.py` on Linux/Unix or press `ctrl+c` while clicked into your console on Windows.
 
 Congrats! You should now be able to use the bot by joining a VC and using the commands above. If not, let me know and I'll try to help as best I can.
