@@ -101,7 +101,7 @@ async def play(ctx: commands.Context, *args):
                            'source_address': '0.0.0.0',
                            'default_search': 'ytsearch',
                            'outtmpl': '%(id)s.%(ext)s',
-                           'noplaylist': True,
+                           'lazy_playlist': True,
                            'allow_playlist_files': False,
                            'cookiesfrombrowser': None,
                            'username': 'oauth2',
@@ -114,26 +114,38 @@ async def play(ctx: commands.Context, *args):
         except yt_dlp.utils.DownloadError as err:
             await notify_about_failure(ctx, err)
             return
-
+        # if single video - no 'entries', just single dict, if playlist - 'entries' is a list of dicts
         if 'entries' in info:
-            info = info['entries'][0]
-        # send link if it was a search, otherwise send title as sending link again would clutter chat with previews
-        await ctx.send('downloading ' + (f'https://youtu.be/{info["id"]}' if will_need_search else f'`{info["title"]}`'))
-        try:
-            ydl.download([query])
-        except yt_dlp.utils.DownloadError as err:
-            await notify_about_failure(ctx, err)
-            return
-        path = f'./dl/{server_id}/{info["id"]}.{info["ext"]}'
-        try:
-            queues[server_id]['queue'].append((path, info))
-        except KeyError: # first in queue
-            queues[server_id] = {'queue': [(path, info)], 'loop': False}
-            try: connection = await voice_state.channel.connect()
-            except discord.ClientException: connection = get_voice_client_from_channel_id(voice_state.channel.id)
-            connection.play(discord.FFmpegOpusAudio(path), after=lambda error=None, connection=connection, server_id=server_id:
-                                                             after_track(error, connection, server_id))
+            for entry in info['entries']:
+                # send link if it was a search, otherwise send title as sending link again would clutter chat with previews
+                await ctx.send('downloading ' + (f'https://youtu.be/{entry["id"]}' if will_need_search else f'`{entry["title"]}`'))
+            try:
+                ydl.download([query])
+            except yt_dlp.utils.DownloadError as err:
+                await notify_about_failure(ctx, err)
+                return
 
+            for entry in info['entries']:
+                try:
+                    path = f'./dl/{server_id}/{entry["id"]}.{entry["ext"]}'
+                    queues[server_id]['queue'].append((path, entry))
+                except KeyError: # first in queue
+                    queues[server_id] = {'queue': [(path, entry)], 'loop': False}
+                    try: connection = await voice_state.channel.connect()
+                    except discord.ClientException: connection = get_voice_client_from_channel_id(voice_state.channel.id)
+                    connection.play(discord.FFmpegOpusAudio(path), after=lambda error=None, connection=connection, server_id=server_id:
+                                                                    after_track(error, connection, server_id))
+        else:
+            await ctx.send('downloading ' + (f'https://youtu.be/{info["id"]}' if will_need_search else f'`{info["title"]}`'))
+            try:
+                path = f'./dl/{server_id}/{info["id"]}.{info["ext"]}'
+                queues[server_id]['queue'].append((path, info))
+            except KeyError:
+                queues[server_id] = {'queue': [(path, info)], 'loop': False}
+                try: connection = await voice_state.channel.connect()
+                except discord.ClientException: connection = get_voice_client_from_channel_id(voice_state.channel.id)
+                connection.play(discord.FFmpegOpusAudio(path), after=lambda error=None, connection=connection, server_id=server_id:
+                                                                after_track(error, connection, server_id))
 @bot.command('loop', aliases=['l'])
 async def loop(ctx: commands.Context, *args):
     if not await sense_checks(ctx):
