@@ -122,7 +122,6 @@ async def play(ctx: commands.Context, *args):
         try:
             ydl.download([query])
         except yt_dlp.utils.DownloadError as err:
-            breakpoint()
             await notify_about_failure(ctx, err)
             return
         path = f'./dl/{server_id}/{info["id"]}.{info["ext"]}'
@@ -218,6 +217,7 @@ async def on_ready():
     print(f'logged in successfully as {bot.user.name}')
 async def notify_about_failure(ctx: commands.Context, err: yt_dlp.utils.DownloadError):
     if BOT_REPORT_DL_ERROR:
+        breakpoint()
         # remove shell colors for discord message
         sanitized = re.compile(r'\x1b[^m]*m').sub('', err.msg).strip()
         if sanitized[0:5].lower() == "error":
