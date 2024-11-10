@@ -97,10 +97,6 @@ async def play(ctx: commands.Context, *args):
     # source address as 0.0.0.0 to force ipv4 because ipv6 breaks it for some reason
     # this is equivalent to --force-ipv4 (line 312 of https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/options.py)
     await ctx.send(f'looking for `{query}`...')
-    import logging
-    logging.basicConfig(level=logging.INFO)
-    logging.getLogger('suds.client').setLevel(logging.DEBUG)
-    logging.getLogger('suds.transport.http').setLevel(logging.DEBUG)
     with yt_dlp.YoutubeDL({'format': YTDL_FORMAT,
                            'source_address': '0.0.0.0',
                            'default_search': 'ytsearch',
@@ -126,6 +122,7 @@ async def play(ctx: commands.Context, *args):
         try:
             ydl.download([query])
         except yt_dlp.utils.DownloadError as err:
+            breakpoint()
             await notify_about_failure(ctx, err)
             return
         path = f'./dl/{server_id}/{info["id"]}.{info["ext"]}'
